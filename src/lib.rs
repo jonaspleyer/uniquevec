@@ -89,6 +89,56 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug)]
 pub struct UniqueVec<T>(Vec<T>);
 
+/// Identical to the [UniqueVec] struct but only supports entry types which implement [Eq].
+pub struct UniqueVecEq<T>(UniqueVec<T>);
+
+impl<T> core::ops::Deref for UniqueVecEq<T>
+where
+    T: Eq,
+{
+    type Target = UniqueVec<T>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T> From<UniqueVecEq<T>> for UniqueVec<T>
+where
+    T: Eq,
+{
+    fn from(value: UniqueVecEq<T>) -> Self {
+        Self(value.0.0)
+    }
+}
+
+impl<T> From<UniqueVec<T>> for UniqueVecEq<T>
+where
+    T: Eq,
+{
+    fn from(value: UniqueVec<T>) -> Self {
+        Self(value)
+    }
+}
+
+impl<T> core::ops::DerefMut for UniqueVecEq<T>
+where
+    T: Eq,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<T> From<Vec<T>> for UniqueVecEq<T>
+where
+    T: Eq,
+{
+    fn from(value: Vec<T>) -> Self {
+        Self(UniqueVec::from(value))
+    }
+}
+
 impl<T> UniqueVec<T> {
     /// Creates an new empty [UniqueVec].
     pub fn new() -> Self {
