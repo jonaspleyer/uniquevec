@@ -3,7 +3,35 @@
 //! It is `no_std` by default but necessarily requires an allocator.
 //! To access elements inside the vector, we implement the [Deref](core::ops::Deref) trait such that
 //! it can be used like a regular [Vec].
+//! We provide distinct types for [PartialEq] and [Eq] traits in order to support a wider variety
+//! of use-cases.
 //! To modify entries or create new instances, we implement methods which are listed below.
+//!
+//! ```
+//! // Create a new empty UniqueVec
+//! use uniquevec::UniqueVec;
+//! let mut uvec = UniqueVec::new();
+//!
+//! // Fill it with contents
+//! uvec.push("cellular");
+//! uvec.push("_");
+//! uvec.push("raza");
+//!
+//! // The next entry is already contained so it will not be added again.
+//! // We can also check the returned value
+//! let r = uvec.push("cellular");
+//! assert_eq!(r, Some("cellular"));
+//!
+//! // Otherwise we can use it similarly to a Vec
+//! assert_eq!(uvec[0], "cellular");
+//! assert_eq!(uvec[1], "_");
+//! assert_eq!(uvec[2], "raza");
+//! assert_eq!(uvec.len(), 3);
+//!
+//! for (n, entry) in uvec.into_iter().enumerate() {
+//!     println!("{n}th entry: {entry}");
+//! }
+//! ```
 //!
 //! ## Create and Modify
 //! | Method | Description |
