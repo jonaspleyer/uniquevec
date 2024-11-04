@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-#![no_std]
 //! This crate offers a [Vec]-like datastructure which only contains unique
 //! entries.
 //! It is `no_std` by default but necessarily requires an allocator.
@@ -21,17 +19,56 @@
 //!
 //! | Trait | Implemented | Comment |
 //! | --- | --- | --- |
-//! | [Deref](core::ops::Deref) | ✅ | |
+//! | [Deref](core::ops::Deref) for [Vec] | ✅ | |
 //! | [DerefMut](core::ops::DerefMut) | ❌ | See the ["Create and Modify"](#create-and-modify) table above. |
 //! | [Extend] | ✅ |
 //! | [From] for [Vec] | ✅ |
 //! | [IntoIterator] | ✅ |
 //!
+//! ## [PartialEq] Warning
+//! Since the [UniqueVec] struct only requires the [PartialEq] trait, some unexpected behaviour
+//! might occurr when using it with types such as [f32] or [f64] which do not implement [Eq].
+//!
+//! ```
+//! # use uniquevec::UniqueVec;
+//! let mut unique_vec = UniqueVec::new();
+//!
+//! // Insert two times NAN values
+//! unique_vec.push(1f64);
+//! unique_vec.push(f64::NAN);
+//! unique_vec.push(f64::NAN);
+//! assert_eq!(unique_vec[0], 1f64);
+//! assert!(unique_vec[1].is_nan());
+//! assert!(unique_vec[2].is_nan());
+//! assert_eq!(unique_vec.len(), 3);
+//! ```
+//! For this particular reason, we provide the [UniqueVecEq] struct which can only be used when the
+//! entry type implements the [Eq] trait.
+//!
+//! ```
+//! # use uniquevec::*;
+//! // This will compile
+//! let mut unique_vec: UniqueVecEq<_> = UniqueVec::new().into();
+//! unique_vec.push(1usize);
+//! ```
+//!
+//! ```compile_fail
+//! # use uniquevec::*;
+//! // This will not compile
+//! let mut unique_vec: UniqueVecEq<_> = UniqueVec::new().into();
+//! unique_vec.push(1f64);
+//! ```
+//!
+//!
 //! ## Features
 //!
 //! - The [serde](https://serde.rs/) feature offers serialization support.
 
+#![no_std]
+#![deny(missing_docs)]
+
 extern crate alloc;
+
 use alloc::vec::Vec;
 
 #[cfg(feature = "serde")]
