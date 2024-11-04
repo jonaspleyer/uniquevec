@@ -2,6 +2,9 @@
 name = "uniquevec"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "A `Vec`-like datastructure which only contains unique entries. It is no_std and has optional serde support."
+repository = "https://github.com/jonaspleyer/uniquevec"
 
 [dependencies]
 serde = { version = "1", features = ["derive"], optional=true  }
